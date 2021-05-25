@@ -1,4 +1,17 @@
 AWSTemplateFormatVersion: '2010-09-09'
+Parameters:
+  InstanceType:
+    Default: t3.micro
+    Description: Instance type
+    Type: String
+  dbRootPassword:
+    Default: myrootpassword
+    Description: db root password
+    Type: String
+  dbWikiUserPassword:
+    Default: wiki123
+    Description: db user password
+    Type: String
 Resources:
   ServiceRole:
     Type: AWS::IAM::Role
@@ -91,6 +104,11 @@ Resources:
       AutoAssignElasticIps: 'false'
       AutoAssignPublicIps: 'true'
       Name: database
+      CustomJson:
+        dbRootPassword:
+          Ref: dbRootPassword
+        dbWikiUserPassword:
+          Ref: dbWikiUserPassword
       CustomRecipes:
         Setup:
         - thoughtworksdemo::database
@@ -107,7 +125,8 @@ Resources:
         Ref: thoughtworksDemoStack
       LayerIds:
       - Ref: databaseLayer
-      InstanceType: t3.micro
+      InstanceType:
+        Ref: InstanceType
       SshKeyName: yogaraj-aws
   webLayer:
     Type: AWS::OpsWorks::Layer
@@ -153,7 +172,8 @@ Resources:
         Ref: thoughtworksDemoStack
       LayerIds:
       - Ref: webLayer
-      InstanceType: t3.micro
+      InstanceType:
+        Ref: InstanceType
       AvailabilityZone: us-east-1a
       InstallUpdatesOnBoot: true
       SshKeyName: yogaraj-aws
@@ -165,7 +185,8 @@ Resources:
         Ref: thoughtworksDemoStack
       LayerIds:
       - Ref: webLayer
-      InstanceType: t3.micro
+      InstanceType:
+        Ref: InstanceType
       AvailabilityZone: us-east-1b
       InstallUpdatesOnBoot: true
       SshKeyName: yogaraj-aws
