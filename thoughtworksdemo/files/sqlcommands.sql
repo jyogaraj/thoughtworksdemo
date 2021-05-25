@@ -1,6 +1,5 @@
 DELETE FROM mysql.user WHERE User='';
 CREATE USER 'wiki'@'%' IDENTIFIED BY 'THISpasswordSHOULDbeCHANGED';
-CREATE DATABASE database_name;
 CREATE DATABASE wikidatabase;  
 GRANT ALL PRIVILEGES ON wikidatabase.* TO 'wiki'@'%';
 FLUSH PRIVILEGES;

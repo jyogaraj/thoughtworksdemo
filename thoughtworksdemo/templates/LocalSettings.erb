@@ -30,7 +30,7 @@ $wgMetaNamespace = "thoughtworks";
 $wgScriptPath = "";
 
 ## The protocol and server name to use in fully-qualified URLs
-$wgServer = <%= node["opsworks"]["instance"]["public_dns_name"] %>;
+$wgServer = "<%= @instance_public_dns %>";
 
 ## The URL path to static resources (images, scripts, etc.)
 $wgResourceBasePath = $wgScriptPath;
@@ -44,8 +44,8 @@ $wgLogos = [ '1x' => "$wgResourceBasePath/resources/assets/wiki.png" ];
 $wgEnableEmail = true;
 $wgEnableUserEmail = true; # UPO
 
-$wgEmergencyContact = "apache@🌻.invalid";
-$wgPasswordSender = "apache@🌻.invalid";
+$wgEmergencyContact = "apache@.invalid";
+$wgPasswordSender = "apache@.invalid";
 
 $wgEnotifUserTalk = false; # UPO
 $wgEnotifWatchlist = false; # UPO
@@ -53,10 +53,10 @@ $wgEmailAuthentication = true;
 
 ## Database settings
 $wgDBtype = "mysql";
-$wgDBserver = <%= node["opsworks"]["layers"]["mdb"]["instances"]["instancehostname"]["private_ip"]%>;
+$wgDBserver = "<%= @db_host %>";
 $wgDBname = "wikidatabase";
 $wgDBuser = "wiki";
-$wgDBpassword = "NEW_USER_PASSWORD";
+$wgDBpassword = <%= node[:mysql][:server_root_password] %>;
 
 # MySQL specific settings
 $wgDBprefix = "";
