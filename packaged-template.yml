@@ -4,14 +4,6 @@ Parameters:
     Default: t3.micro
     Description: Instance type
     Type: String
-  dbRootPassword:
-    Default: myrootpassword
-    Description: db root password
-    Type: String
-  dbWikiUserPassword:
-    Default: wiki123
-    Description: db user password
-    Type: String
 Resources:
   ServiceRole:
     Type: AWS::IAM::Role
@@ -104,11 +96,6 @@ Resources:
       AutoAssignElasticIps: 'false'
       AutoAssignPublicIps: 'true'
       Name: database
-      CustomJson:
-        dbRootPassword:
-          Ref: dbRootPassword
-        dbWikiUserPassword:
-          Ref: dbWikiUserPassword
       CustomRecipes:
         Setup:
         - thoughtworksdemo::database
