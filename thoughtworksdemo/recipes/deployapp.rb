@@ -7,7 +7,7 @@
 require 'securerandom'
 random_string = SecureRandom.hex
 
-directory "/tmp/#{random_string}"" do
+directory "/tmp/#{random_string}" do
   owner 'root'
   group 'root'
   mode '0755'
@@ -32,7 +32,7 @@ end
 ruby_block "replace document root" do
     block do
       fe = Chef::Util::FileEdit.new("/etc/httpd/conf/httpd.conf")
-      fe.search_file_replace(/"\/var\/www\/html"/,"/var\/www\/\mw")
+      fe.search_file_replace(/"\/var\/www\/html"/,"#{node['mediawiki']['path']}")
       fe.write_file
     end
 end
@@ -41,7 +41,7 @@ layerID = ''
 dbhostip = ''
 search("aws_opsworks_layer").each do |layer|
   Chef::Log.info("********** The layer's name is '#{layer['name']}' **********")
-  if layer['name'] == 'database'
+  if layer['name'] == "#{node[:mysql][:layername]}"
     layerID = layer['layer_id']
   end
 end

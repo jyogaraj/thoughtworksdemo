@@ -124,6 +124,7 @@ Resources:
         Setup:
         - thoughtworksdemo::phpsetup
         - thoughtworksdemo::httpdsetup
+        - thoughtworksdemo::deployapp
         Deploy:
         - thoughtworksdemo::deployapp
         Shutdown:
