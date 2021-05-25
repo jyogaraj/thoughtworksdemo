@@ -23,6 +23,8 @@ cookbook_file  '/tmp/hardening.sql' do
     source 'hardening.sql'
 end
 
+Chef::Log.info("********** The layer's id is '#{node[:dbpasswordfrom]}' **********")
+
 execute 'assign root password' do
     command "#{node[:mysql][:mysqladmin_bin]} -u root password \"#{node[:mysql][:server_root_password]}\""
     action :run

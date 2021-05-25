@@ -120,6 +120,18 @@ Resources:
       EnableAutoHealing: 'true'
       AutoAssignElasticIps: 'false'
       AutoAssignPublicIps: 'true'
+      LoadBasedAutoScaling:
+        DownScaling:
+          CpuThreshold: 30
+          InstanceCount: 1
+          ThresholdsWaitTime: 10
+          IgnoreMetricsTime: 10
+        Enable: true
+        UpScaling:
+          CpuThreshold: 70
+          InstanceCount: 1
+          ThresholdsWaitTime: 10
+          IgnoreMetricsTime: 10
       CustomRecipes:
         Setup:
         - thoughtworksdemo::phpsetup
@@ -169,3 +181,28 @@ Resources:
         Url: https://releases.wikimedia.org/mediawiki/1.35/mediawiki-1.35.2.tar.gz
       Attributes:
         DocumentRoot: web
+  elb:
+    Type: AWS::ElasticLoadBalancing::LoadBalancer
+    Properties:
+      AvailabilityZones:
+      - us-east-1a
+      - us-east-1b
+      CrossZone: true
+      Listeners:
+      - InstancePort: '80'
+        InstanceProtocol: HTTP
+        LoadBalancerPort: '80'
+        Protocol: HTTP
+      HealthCheck:
+        Target: HTTP:80/index.php/Main_Page
+        HealthyThreshold: '2'
+        UnhealthyThreshold: '3'
+        Interval: '10'
+        Timeout: '5'
+  elbAttach:
+    Type: AWS::OpsWorks::ElasticLoadBalancerAttachment
+    Properties:
+      ElasticLoadBalancerName:
+        Ref: elb
+      LayerId:
+        Ref: webLayer
