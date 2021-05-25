@@ -23,14 +23,6 @@ cookbook_file  '/tmp/hardening.sql' do
     source 'hardening.sql'
 end
 
-ruby_block "replace password" do
-    block do
-      fe = Chef::Util::FileEdit.new("/tmp/sqlcommands.sql")
-      fe.search_file_replace(/"THISpasswordSHOULDbeCHANGED"/,"#{node[:mysql][:wiki_user_password]}")
-      fe.write_file
-    end
-end
-
 execute 'assign root password' do
     command "#{node[:mysql][:mysqladmin_bin]} -u root password \"#{node[:mysql][:server_root_password]}\""
     action :run
@@ -41,6 +33,13 @@ execute 'hardening db' do
     command "#{node[:mysql][:mysql_bin]} -u root -p#{node[:mysql][:server_root_password]} < /tmp/hardening.sql"
     action :run
     only_if "#{node[:mysql][:mysql_bin]} -u root -p#{node[:mysql][:server_root_password]} -e 'show databases like \"test\"'|grep test"
+end
+
+bash 'replace password' do
+    code <<-EOH
+        cat /tmp/sqlcommands.sql|sed "s/THISpasswordSHOULDbeCHANGED/#{node[:mysql][:wiki_user_password]}/g" > /tmp/.temp
+        cp /tmp/.temp /tmp/sqlcommands.sql
+    EOH
 end
 
 execute 'create db for wiki' do
