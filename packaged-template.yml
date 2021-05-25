@@ -62,6 +62,24 @@ Resources:
       CustomCookbooksSource:
         Type: git
         Url: git://github.com/jyogaraj/thoughtworksdemo.git
+  databaseSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow DB connection
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 3306
+        ToPort: 3306
+        CidrIp: 0.0.0.0/0
+  webserverSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow http to client host
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
+        CidrIp: 0.0.0.0/0
   databaseLayer:
     Type: AWS::OpsWorks::Layer
     Properties:
@@ -78,6 +96,10 @@ Resources:
         - thoughtworksdemo::database
         Shutdown:
         - thoughtworksdemo::databasestop
+      CustomSecurityGroupIds:
+      - Fn::GetAtt:
+        - databaseSG
+        - GroupId
   dbInstance:
     Type: AWS::OpsWorks::Instance
     Properties:
@@ -106,7 +128,12 @@ Resources:
         - thoughtworksdemo::deployapp
         Shutdown:
         - thoughtworksdemo::httpdstop
+      CustomSecurityGroupIds:
+      - Fn::GetAtt:
+        - webserverSG
+        - GroupId
   webInstance1:
+    DependsOn: dbInstance
     Type: AWS::OpsWorks::Instance
     Properties:
       StackId:
@@ -118,6 +145,7 @@ Resources:
       InstallUpdatesOnBoot: true
       SshKeyName: yogaraj-aws
   webInstance2:
+    DependsOn: dbInstance
     Type: AWS::OpsWorks::Instance
     Properties:
       StackId:
@@ -128,3 +156,15 @@ Resources:
       AvailabilityZone: us-east-1b
       InstallUpdatesOnBoot: true
       SshKeyName: yogaraj-aws
+  mediawikiApp:
+    Type: AWS::OpsWorks::App
+    Properties:
+      StackId:
+        Ref: thoughtworksDemoStack
+      Type: other
+      Name: mediawiki
+      AppSource:
+        Type: archive
+        Url: https://releases.wikimedia.org/mediawiki/1.35/mediawiki-1.35.2.tar.gz
+      Attributes:
+        DocumentRoot: web

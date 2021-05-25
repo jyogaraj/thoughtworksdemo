@@ -7,7 +7,10 @@
 require 'securerandom'
 random_string = SecureRandom.hex
 
-directory "/tmp/#{random_string}" do
+directory "/tmp/#{random_string}"" do
+  owner 'root'
+  group 'root'
+  mode '0755'
   action :create
 end
 
@@ -38,7 +41,7 @@ layerID = ''
 dbhostip = ''
 search("aws_opsworks_layer").each do |layer|
   Chef::Log.info("********** The layer's name is '#{layer['name']}' **********")
-  if layer['name'] == 'mariadb-layer'
+  if layer['name'] == 'database'
     layerID = layer['layer_id']
   end
 end
@@ -74,7 +77,7 @@ bash 'Install mediawiki' do
   user 'root'
   cwd  "#{node['mediawiki']['path']}"
   code <<-EOH
-  /usr/bin/php #{node['mediawiki']['path']}/maintenance/install.php --conf #{node['mediawiki']['path']}/LocalSettings.php #{node['mediawiki']['title']} admin --pass #{node['mediawiki']['password']} --dbname wikidatabase --dbuser wiki --dbpass #{node['mysql']['wiki_user_password']} --dbserver #{dbhostip} --lang #{node['mediawiki']['lang']} --scriptpath '' --server http://#{instance['public_dns']}
+    /usr/bin/php #{node['mediawiki']['path']}/maintenance/install.php --conf #{node['mediawiki']['path']}/LocalSettings.php #{node['mediawiki']['title']} admin --pass #{node['mediawiki']['password']} --dbname wikidatabase --dbuser wiki --dbpass #{node['mysql']['wiki_user_password']} --dbserver #{db_host} --lang #{node['mediawiki']['lang']} --scriptpath '' --server http://#{instance['public_dns']}
   EOH
   not_if { ::File.exist?(node['mediawiki']['path'] + '/LocalSettings.php') }
 end
