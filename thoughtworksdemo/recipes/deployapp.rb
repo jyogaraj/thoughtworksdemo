@@ -77,7 +77,7 @@ bash 'Install mediawiki' do
   user 'root'
   cwd  "#{node['mediawiki']['path']}"
   code <<-EOH
-  /usr/bin/php #{node['mediawiki']['path']}/maintenance/install.php --conf #{node['mediawiki']['path']}/LocalSettings.php #{node['mediawiki']['title']} admin --pass #{node['mediawiki']['password']} --dbname wikidatabase --dbuser wiki --dbpass #{node['mysql']['wiki_user_password']} --dbserver #{db_host} --lang #{node['mediawiki']['lang']} --scriptpath '' --server 'http://#{instance['public_dns']}'
+  /usr/bin/php #{node['mediawiki']['path']}/maintenance/install.php --conf #{node['mediawiki']['path']}/LocalSettings.php #{node['mediawiki']['title']} admin --pass #{node['mediawiki']['password']} --dbname wikidatabase --dbuser wiki --dbpass #{node['mysql']['wiki_user_password']} --dbserver #{db_host} --lang #{node['mediawiki']['lang']} --scriptpath '' --server ''
   EOH
   not_if { ::File.exist?(node['mediawiki']['path'] + '/LocalSettings.php') }
 end
