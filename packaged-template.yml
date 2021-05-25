@@ -102,8 +102,6 @@ Resources:
         Setup:
         - thoughtworksdemo::phpsetup
         - thoughtworksdemo::httpdsetup
-        Configure:
-        - thoughtworksdemo::configure
         Deploy:
         - thoughtworksdemo::deployapp
         Shutdown:

@@ -7,6 +7,10 @@
 require 'securerandom'
 random_string = SecureRandom.hex
 
+directory "/tmp/#{random_string}" do
+  action :create
+end
+
 remote_file "/tmp/#{random_string}/mediawiki-1.35.2.tar.gz" do
   source 'https://releases.wikimedia.org/mediawiki/1.35/mediawiki-1.35.2.tar.gz'
   mode '0755'
