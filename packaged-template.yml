@@ -1,0 +1,132 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Resources:
+  ServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: opsworks.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: /
+      Policies:
+      - PolicyName: opsworks-service
+        PolicyDocument:
+          Statement:
+          - Effect: Allow
+            Action:
+            - ec2:*
+            - iam:PassRole
+            - cloudwatch:GetMetricStatistics
+            - cloudwatch:DescribeAlarms
+            - elasticloadbalancing:*
+            Resource: '*'
+  OpsWorksEC2Role:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: ec2.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: /
+  InstanceRole:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: /
+      Roles:
+      - Ref: OpsWorksEC2Role
+  thoughtworksDemoStack:
+    Type: AWS::OpsWorks::Stack
+    Properties:
+      Name:
+        Ref: AWS::StackName
+      ConfigurationManager:
+        Name: Chef
+        Version: 12
+      ServiceRoleArn:
+        Fn::GetAtt:
+        - ServiceRole
+        - Arn
+      DefaultInstanceProfileArn:
+        Fn::GetAtt:
+        - InstanceRole
+        - Arn
+      UseCustomCookbooks: 'true'
+      DefaultOs: Amazon Linux 2
+      DefaultRootDeviceType: ebs
+      CustomCookbooksSource:
+        Type: git
+        Url: git://github.com/jyogaraj/thoughtworksdemo.git
+  databaseLayer:
+    Type: AWS::OpsWorks::Layer
+    Properties:
+      StackId:
+        Ref: thoughtworksDemoStack
+      Type: custom
+      Shortname: db
+      EnableAutoHealing: 'true'
+      AutoAssignElasticIps: 'false'
+      AutoAssignPublicIps: 'true'
+      Name: database
+      CustomRecipes:
+        Setup:
+        - thoughtworksdemo::database
+        Shutdown:
+        - thoughtworksdemo::databasestop
+  dbInstance:
+    Type: AWS::OpsWorks::Instance
+    Properties:
+      StackId:
+        Ref: thoughtworksDemoStack
+      LayerIds:
+      - Ref: databaseLayer
+      InstanceType: t3.micro
+      SshKeyName: yogaraj-aws
+  webLayer:
+    Type: AWS::OpsWorks::Layer
+    Properties:
+      StackId:
+        Ref: thoughtworksDemoStack
+      Type: custom
+      Name: website
+      Shortname: web
+      EnableAutoHealing: 'true'
+      AutoAssignElasticIps: 'false'
+      AutoAssignPublicIps: 'true'
+      CustomRecipes:
+        Setup:
+        - thoughtworksdemo::phpsetup
+        - thoughtworksdemo::httpdsetup
+        Configure:
+        - thoughtworksdemo::configure
+        Deploy:
+        - thoughtworksdemo::deployapp
+        Shutdown:
+        - thoughtworksdemo::httpdstop
+  webInstance1:
+    Type: AWS::OpsWorks::Instance
+    Properties:
+      StackId:
+        Ref: thoughtworksDemoStack
+      LayerIds:
+      - Ref: webLayer
+      InstanceType: t3.micro
+      AvailabilityZone: us-east-1a
+      InstallUpdatesOnBoot: true
+      SshKeyName: yogaraj-aws
+  webInstance2:
+    Type: AWS::OpsWorks::Instance
+    Properties:
+      StackId:
+        Ref: thoughtworksDemoStack
+      LayerIds:
+      - Ref: webLayer
+      InstanceType: t3.micro
+      AvailabilityZone: us-east-1b
+      InstallUpdatesOnBoot: true
+      SshKeyName: yogaraj-aws
