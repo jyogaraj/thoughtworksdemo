@@ -22,12 +22,23 @@ end
 
 instance = search("aws_opsworks_instance", "self:true").first
 
-template '/var/www/mw/LocalSettings.php' do
-    source 'LocalSettings.erb'
-    owner 'root'
-    variables(
-      'db_host': dbhostip,
-      'instance_public_dns': instance['public_dns']
-    )
-    action :create
+#template '/var/www/mw/LocalSettings.php' do
+#    source 'LocalSettings.erb'
+#    owner 'root'
+#    variables(
+#      'db_host': dbhostip || node[:dbhost],
+#      'instance_public_dns': instance['public_dns']
+#    )
+#    action :create
+#end
+
+db_host = dbhostip || node[:dbhost]
+
+bash 'Install mediawiki' do
+  user 'root'
+  cwd  "#{node['mediawiki']['path']}"
+  code <<-EOH
+  /usr/bin/php #{node['mediawiki']['path']}/maintenance/install.php --conf #{node['mediawiki']['path']}/LocalSettings.php #{node['mediawiki']['title']} admin --pass #{node['mediawiki']['password']} --dbname wikidatabase --dbuser wiki --dbpass #{node['mysql']['wiki_user_password']} --dbserver #{dbhostip} --lang #{node['mediawiki']['lang']} --scriptpath '' --server http://#{instance['public_dns']}
+  EOH
+  not_if { ::File.exist?(node['mediawiki']['path'] + '/LocalSettings.php') }
 end

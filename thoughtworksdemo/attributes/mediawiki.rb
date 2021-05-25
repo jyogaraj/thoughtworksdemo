@@ -1,0 +1,7 @@
+default['mediawiki']['apps'] = 'thoughtworks'
+default['mediawiki']['admin'] = 'admin'
+default['mediawiki']['password'] = 'adminpassword'
+default['mediawiki']['domain'] = 'mediawiki.dev'
+default['mediawiki']['title'] = 'thoughtworks-mediawiki'
+default['mediawiki']['lang'] = 'en'
+default['mediawiki']['path'] = '/var/www/mw'

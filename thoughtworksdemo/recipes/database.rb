@@ -47,3 +47,11 @@ execute 'create db for wiki' do
     action :run
     not_if "#{node[:mysql][:mysql_bin]} -u root -p#{node[:mysql][:server_root_password]} -e 'show databases like \"wikidatabase\"'|grep wikidatabase"
 end
+
+file '/tmp/sqlcommands.sql' do
+    action :delete
+end
+
+file '/tmp/hardening.sql' do
+    action :delete
+end
