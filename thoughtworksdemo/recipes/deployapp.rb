@@ -47,23 +47,32 @@ search("aws_opsworks_layer").each do |layer|
 end
 Chef::Log.info("********** The Database layer's id is '#{layerID}' **********")
 
-
+db_instances=[]
 search("aws_opsworks_instance").each do |instance|
     Chef::Log.info("********** The instance's hostname is '#{instance['hostname']}' **********")
     Chef::Log.info("********** The #{instance['hostname']} layerid is #{instance['layer_ids']}**********")
     if instance['layer_ids'].include?(layerID)
         Chef::Log.info("#{instance['instance_id']} - #{instance['hostname']} - #{instance['status']}")
         if instance['status'] == 'online'
-            bash 'Install mediawiki' do
-              user 'root'
-              cwd  "#{node['mediawiki']['path']}"
-              code <<-EOH
-              /usr/bin/php #{node['mediawiki']['path']}/maintenance/install.php --conf /var/tmp/LocalSettings.php #{node['mediawiki']['title']} admin --pass #{node['mediawiki']['password']} --dbname wikidatabase --dbuser wiki --dbpass #{node['mysql']['wiki_user_password']} --dbserver #{instance['private_ip']} --lang #{node['mediawiki']['lang']} --scriptpath '' --server ''
-              EOH
-              not_if { ::File.exist?('/var/tmp/LocalSettings.php') }
-            end
+          db_instances.push(instance['private_ip'])
         end
     end
+end
+print db_instances
+
+db_instances.each do |instip|
+  bash 'DB Configure Mediawiki' do
+    user 'root'
+    cwd  "#{node['mediawiki']['path']}"
+    code <<-EOH
+    /usr/bin/php #{node['mediawiki']['path']}/maintenance/install.php --conf #{node['mediawiki']['path']}/LocalSettings.php #{node['mediawiki']['title']} admin --pass #{node['mediawiki']['password']} --dbname wikidatabase --dbuser wiki --dbpass #{node['mysql']['wiki_user_password']} --dbserver #{instip} --lang #{node['mediawiki']['lang']} --scriptpath '' --server ''
+    EOH
+    not_if { ::File.exist?(node['mediawiki']['path'] + '/LocalSettings.php') }
+  end
+end
+
+execute "move file" do
+  command "mv /var/www/mw/LocalSettings.php /var/tmp"
 end
 
 instance = search("aws_opsworks_instance", "self:true").first
@@ -85,7 +94,6 @@ search("aws_opsworks_elastic_load_balancer").each do |elastic_load_balancer|
     dbhostip = elastic_load_balancer['dns_name']
   end
 end
-
 
 db_host = dbhostip || node[:dbhost]
 
