@@ -1,6 +1,10 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Parameters:
-  InstanceType:
+  WebInstanceType:
+    Default: t3.micro
+    Description: Instance type
+    Type: String
+  DBInstanceType:
     Default: t3.micro
     Description: Instance type
     Type: String
@@ -95,6 +99,18 @@ Resources:
       EnableAutoHealing: 'true'
       AutoAssignElasticIps: 'false'
       AutoAssignPublicIps: 'true'
+      LoadBasedAutoScaling:
+        DownScaling:
+          CpuThreshold: 30
+          InstanceCount: 1
+          ThresholdsWaitTime: 10
+          IgnoreMetricsTime: 10
+        Enable: true
+        UpScaling:
+          CpuThreshold: 70
+          InstanceCount: 1
+          ThresholdsWaitTime: 10
+          IgnoreMetricsTime: 10
       Name: database
       CustomRecipes:
         Setup:
@@ -113,8 +129,20 @@ Resources:
       LayerIds:
       - Ref: databaseLayer
       InstanceType:
-        Ref: InstanceType
-      SshKeyName: yogaraj-aws
+        Ref: DBInstanceType
+      AvailabilityZone: us-east-1a
+      InstallUpdatesOnBoot: true
+  dbInstance2:
+    Type: AWS::OpsWorks::Instance
+    Properties:
+      StackId:
+        Ref: thoughtworksDemoStack
+      LayerIds:
+      - Ref: databaseLayer
+      InstanceType:
+        Ref: DBInstanceType
+      AvailabilityZone: us-east-1b
+      InstallUpdatesOnBoot: true
   webLayer:
     Type: AWS::OpsWorks::Layer
     Properties:
@@ -160,10 +188,9 @@ Resources:
       LayerIds:
       - Ref: webLayer
       InstanceType:
-        Ref: InstanceType
+        Ref: WebInstanceType
       AvailabilityZone: us-east-1a
       InstallUpdatesOnBoot: true
-      SshKeyName: yogaraj-aws
   webInstance2:
     DependsOn: dbInstance
     Type: AWS::OpsWorks::Instance
@@ -173,10 +200,9 @@ Resources:
       LayerIds:
       - Ref: webLayer
       InstanceType:
-        Ref: InstanceType
+        Ref: WebInstanceType
       AvailabilityZone: us-east-1b
       InstallUpdatesOnBoot: true
-      SshKeyName: yogaraj-aws
   mediawikiApp:
     Type: AWS::OpsWorks::App
     Properties:
@@ -221,7 +247,6 @@ Resources:
       - us-east-1b
       CrossZone: true
       LoadBalancerName: thoughtworks-database-elb
-      Scheme: internal
       SecurityGroups:
       - Fn::GetAtt:
         - databaseSG
@@ -245,3 +270,10 @@ Resources:
         Ref: dbElb
       LayerId:
         Ref: databaseLayer
+Outputs:
+  website:
+    Description: mediawiki website
+    Value:
+      Fn::GetAtt:
+      - elb
+      - DNSName
