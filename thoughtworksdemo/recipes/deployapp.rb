@@ -48,16 +48,16 @@ end
 Chef::Log.info("********** The layer's id is '#{layerID}' **********")
 
 
-search("aws_opsworks_instance").each do |instance|
-    Chef::Log.info("********** The instance's hostname is '#{instance['hostname']}' **********")
-    Chef::Log.info("#{instance['layer_ids']}")
-    if instance['layer_ids'].include?(layerID)
-        Chef::Log.info("#{instance['instance_id']} - #{instance['status']}")
-        if instance['status'] == 'online'
-            dbhostip = instance['private_ip']
-        end
-    end
-end
+#search("aws_opsworks_instance").each do |instance|
+#    Chef::Log.info("********** The instance's hostname is '#{instance['hostname']}' **********")
+#    Chef::Log.info("#{instance['layer_ids']}")
+#    if instance['layer_ids'].include?(layerID)
+#        Chef::Log.info("#{instance['instance_id']} - #{instance['status']}")
+#        if instance['status'] == 'online'
+#            dbhostip = instance['private_ip']
+#        end
+#    end
+#end
 
 instance = search("aws_opsworks_instance", "self:true").first
 
@@ -73,11 +73,9 @@ instance = search("aws_opsworks_instance", "self:true").first
 
 search("aws_opsworks_elastic_load_balancer").each do |elastic_load_balancer|
   Chef::Log.info("********** The ELB's DNS name is '#{elastic_load_balancer['dns_name']}' **********")
-  Chef::Log.info("********** The ELB's DNS name is '#{elastic_load_balancer['layer_id']}' **********")
   if elastic_load_balancer['layer_id'] == layerID
     Chef::Log.info("********** The ELB's DNS name is '#{elastic_load_balancer['dns_name']}' **********")
-    Chef::Log.info("********** The ELB's DNS name is '#{elastic_load_balancer['dns_name']}' **********")
-    Chef::Log.info("********** The ELB's DNS name is '#{elastic_load_balancer['dns_name']}' **********")
+    dbhostip = elastic_load_balancer['dns_name']
   end
 end
 
