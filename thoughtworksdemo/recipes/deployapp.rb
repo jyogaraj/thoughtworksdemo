@@ -75,9 +75,9 @@ search("aws_opsworks_elastic_load_balancer").each do |elastic_load_balancer|
   Chef::Log.info("********** The ELB's DNS name is '#{elastic_load_balancer['dns_name']}' **********")
   Chef::Log.info("********** The ELB's DNS name is '#{elastic_load_balancer['layer_id']}' **********")
   if elastic_load_balancer['layer_id'] == layerID
-    Chef::Log.info("********** The ELB's DNS name is '#{elastic_load_balancer['layer_id']}' **********")
-    Chef::Log.info("********** The ELB's DNS name is '#{elastic_load_balancer['layer_id']}' **********")
-    Chef::Log.info("********** The ELB's DNS name is '#{elastic_load_balancer['layer_id']}' **********")
+    Chef::Log.info("********** The ELB's DNS name is '#{elastic_load_balancer['dns_name']}' **********")
+    Chef::Log.info("********** The ELB's DNS name is '#{elastic_load_balancer['dns_name']}' **********")
+    Chef::Log.info("********** The ELB's DNS name is '#{elastic_load_balancer['dns_name']}' **********")
   end
 end
 
