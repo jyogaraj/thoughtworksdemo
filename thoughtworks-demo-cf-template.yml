@@ -181,25 +181,49 @@ Resources:
       Attributes:
         DocumentRoot: web
   elb:
-      Type: AWS::ElasticLoadBalancing::LoadBalancer
-      Properties:
-        AvailabilityZones:
-        - "us-east-1a"
-        - "us-east-1b"
-        CrossZone: true
-        Listeners:
-        - InstancePort: '80'
-          InstanceProtocol: HTTP
-          LoadBalancerPort: '80'
-          Protocol: HTTP
-        HealthCheck:
-          Target: HTTP:80/index.php/Main_Page
-          HealthyThreshold: '2'
-          UnhealthyThreshold: '3'
-          Interval: '10'
-          Timeout: '5'
+    DependsOn: webInstance1
+    Type: AWS::ElasticLoadBalancing::LoadBalancer
+    Properties:
+      AvailabilityZones:
+      - "us-east-1a"
+      - "us-east-1b"
+      CrossZone: true
+      SecurityGroups:
+      - !GetAtt   webserverSG.GroupId
+      LoadBalancerName: thoughtworks-web-elb
+      Listeners:
+      - InstancePort: '80'
+        InstanceProtocol: HTTP
+        LoadBalancerPort: '80'
+        Protocol: HTTP
+      HealthCheck:
+        Target: HTTP:80/index.php/Main_Page
+        HealthyThreshold: '2'
+        UnhealthyThreshold: '3'
+        Interval: '10'
+        Timeout: '5'
+  dbElb:
+    Type: AWS::ElasticLoadBalancing::LoadBalancer
+    Properties:
+      AvailabilityZones:
+      - "us-east-1a"
+      - "us-east-1b"
+      CrossZone: true
+      LoadBalancerName: thoughtworks-database-elb
+      SecurityGroups:
+      - !GetAtt   databaseSG.GroupId
+      Listeners:
+      - InstancePort: '3306'
+        InstanceProtocol: TCP
+        LoadBalancerPort: '3306'
+        Protocol: TCP
   elbAttach:
     Type: AWS::OpsWorks::ElasticLoadBalancerAttachment
     Properties:
       ElasticLoadBalancerName: !Ref elb
       LayerId: !Ref webLayer
+  dbElbAttach:
+    Type: AWS::OpsWorks::ElasticLoadBalancerAttachment
+    Properties:
+      ElasticLoadBalancerName: !Ref dbElb
+      LayerId: !Ref databaseLayer

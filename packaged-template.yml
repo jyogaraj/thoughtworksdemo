@@ -190,12 +190,18 @@ Resources:
       Attributes:
         DocumentRoot: web
   elb:
+    DependsOn: webInstance1
     Type: AWS::ElasticLoadBalancing::LoadBalancer
     Properties:
       AvailabilityZones:
       - us-east-1a
       - us-east-1b
       CrossZone: true
+      SecurityGroups:
+      - Fn::GetAtt:
+        - webserverSG
+        - GroupId
+      LoadBalancerName: thoughtworks-web-elb
       Listeners:
       - InstancePort: '80'
         InstanceProtocol: HTTP
@@ -207,6 +213,23 @@ Resources:
         UnhealthyThreshold: '3'
         Interval: '10'
         Timeout: '5'
+  dbElb:
+    Type: AWS::ElasticLoadBalancing::LoadBalancer
+    Properties:
+      AvailabilityZones:
+      - us-east-1a
+      - us-east-1b
+      CrossZone: true
+      LoadBalancerName: thoughtworks-database-elb
+      SecurityGroups:
+      - Fn::GetAtt:
+        - databaseSG
+        - GroupId
+      Listeners:
+      - InstancePort: '3306'
+        InstanceProtocol: TCP
+        LoadBalancerPort: '3306'
+        Protocol: TCP
   elbAttach:
     Type: AWS::OpsWorks::ElasticLoadBalancerAttachment
     Properties:
@@ -214,3 +237,10 @@ Resources:
         Ref: elb
       LayerId:
         Ref: webLayer
+  dbElbAttach:
+    Type: AWS::OpsWorks::ElasticLoadBalancerAttachment
+    Properties:
+      ElasticLoadBalancerName:
+        Ref: dbElb
+      LayerId:
+        Ref: databaseLayer
