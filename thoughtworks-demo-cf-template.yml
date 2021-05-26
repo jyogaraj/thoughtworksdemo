@@ -210,6 +210,7 @@ Resources:
       - "us-east-1b"
       CrossZone: true
       LoadBalancerName: thoughtworks-database-elb
+      Scheme: internal
       SecurityGroups:
       - !GetAtt   databaseSG.GroupId
       Listeners:
@@ -227,3 +228,7 @@ Resources:
     Properties:
       ElasticLoadBalancerName: !Ref dbElb
       LayerId: !Ref databaseLayer
+Outputs:
+  website:
+    Description: mediawiki website
+    Value: !GetAtt elb.DNSName

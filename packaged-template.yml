@@ -221,6 +221,7 @@ Resources:
       - us-east-1b
       CrossZone: true
       LoadBalancerName: thoughtworks-database-elb
+      Scheme: internal
       SecurityGroups:
       - Fn::GetAtt:
         - databaseSG

@@ -48,16 +48,23 @@ end
 Chef::Log.info("********** The layer's id is '#{layerID}' **********")
 
 
-#search("aws_opsworks_instance").each do |instance|
-#    Chef::Log.info("********** The instance's hostname is '#{instance['hostname']}' **********")
-#    Chef::Log.info("#{instance['layer_ids']}")
-#    if instance['layer_ids'].include?(layerID)
-#        Chef::Log.info("#{instance['instance_id']} - #{instance['status']}")
-#        if instance['status'] == 'online'
-#            dbhostip = instance['private_ip']
-#        end
-#    end
-#end
+search("aws_opsworks_instance").each do |instance|
+    Chef::Log.info("********** The instance's hostname is '#{instance['hostname']}' **********")
+    Chef::Log.info("#{instance['layer_ids']}")
+    if instance['layer_ids'].include?(layerID)
+        Chef::Log.info("#{instance['instance_id']} - #{instance['status']}")
+        if instance['status'] == 'online'
+            bash 'Install mediawiki' do
+              user 'root'
+              cwd  "#{node['mediawiki']['path']}"
+              code <<-EOH
+              /usr/bin/php #{node['mediawiki']['path']}/maintenance/install.php --conf #{node['mediawiki']['path']}/LocalSettings.php #{node['mediawiki']['title']} admin --pass #{node['mediawiki']['password']} --dbname wikidatabase --dbuser wiki --dbpass #{node['mysql']['wiki_user_password']} --dbserver #{instance['private_ip']} --lang #{node['mediawiki']['lang']} --scriptpath '' --server ''
+              EOH
+              not_if { ::File.exist?(node['mediawiki']['path'] + '/LocalSettings.php') }
+            end
+        end
+    end
+end
 
 instance = search("aws_opsworks_instance", "self:true").first
 
