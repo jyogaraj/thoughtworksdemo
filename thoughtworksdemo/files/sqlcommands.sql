@@ -1,3 +1,4 @@
+SET GLOBAL max_connections=10000;
 DELETE FROM mysql.user WHERE User='';
 CREATE USER 'wiki'@'%' IDENTIFIED BY 'THISpasswordSHOULDbeCHANGED';
 CREATE DATABASE wikidatabase;  

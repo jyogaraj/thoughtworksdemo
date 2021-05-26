@@ -46,6 +46,17 @@ bash 'replace password' do
         cp /tmp/.temp /tmp/sqlcommands.sql
     EOH
 end
+  
+
+bash 'increase max connections' do
+    code <<-EOH
+        echo "max_connections=100000" >> /etc/my.cnf.d/server.cnf
+    EOH
+end
+
+service "mariadb" do
+    action [:restart]
+end
 
 execute 'create db for wiki' do
     command "#{node[:mysql][:mysql_bin]} -u root -p#{node[:mysql][:server_root_password]} < /tmp/sqlcommands.sql"
