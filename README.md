@@ -15,7 +15,10 @@ aws cloudformation package --template-file thoughtworks-demo-cf-template.yml --s
 ```bash
  aws cloudformation deploy --template-file packaged-template.yml --stack-name thoughtworks-demo-stack  --capabilities CAPABILITY_IAM --tags purpose=demo demoby=yogaraj.jawahar@gmail.com
 ```
-
+### deleting stack
+```bash
+ aws cloudformation delete-stack --stack-name thoughtworks-demo-stack
+```
 ## Installation Manual
 
 - Login to aws and navigate to cloudformation service
