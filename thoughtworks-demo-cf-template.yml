@@ -131,7 +131,6 @@ Resources:
       InstanceType: !Ref DBInstanceType
       AvailabilityZone: us-east-1a
       InstallUpdatesOnBoot: true
-      SshKeyName: yogaraj-aws
   webLayer:
     Type: AWS::OpsWorks::Layer
     Properties:
@@ -175,7 +174,6 @@ Resources:
       InstanceType: !Ref WebInstanceType
       AvailabilityZone: us-east-1a
       InstallUpdatesOnBoot: true
-      SshKeyName: yogaraj-aws
   webInstance2:
     DependsOn: dbInstance
     Type: AWS::OpsWorks::Instance
@@ -186,7 +184,6 @@ Resources:
       InstanceType: !Ref WebInstanceType
       AvailabilityZone: us-east-1b
       InstallUpdatesOnBoot: true
-      SshKeyName: yogaraj-aws
   mediawikiApp:
     Type: AWS::OpsWorks::App
     Properties:
