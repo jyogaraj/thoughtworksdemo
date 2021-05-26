@@ -45,14 +45,14 @@ search("aws_opsworks_layer").each do |layer|
     layerID = layer['layer_id']
   end
 end
-Chef::Log.info("********** The layer's id is '#{layerID}' **********")
+Chef::Log.info("********** The Database layer's id is '#{layerID}' **********")
 
 
 search("aws_opsworks_instance").each do |instance|
     Chef::Log.info("********** The instance's hostname is '#{instance['hostname']}' **********")
-    Chef::Log.info("#{instance['layer_ids']}")
+    Chef::Log.info("********** The #{instance['hostname']} layerid is #{instance['layer_ids']}**********")
     if instance['layer_ids'].include?(layerID)
-        Chef::Log.info("#{instance['instance_id']} - #{instance['status']}")
+        Chef::Log.info("#{instance['instance_id']} - #{instance['hostname']} - #{instance['status']}")
         if instance['status'] == 'online'
             bash 'Install mediawiki' do
               user 'root'
