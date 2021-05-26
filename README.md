@@ -39,3 +39,4 @@ aws cloudformation package --template-file thoughtworks-demo-cf-template.yml --s
 
 - thoughtworks-demo-cf-template.yml is cloudformation template
 - thoughtworksdemo/ is chef cookbook 
+- password/titles/email etc can be configured in cookbook attribute section.
