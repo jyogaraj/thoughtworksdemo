@@ -89,7 +89,7 @@ end
 
 db_host = dbhostip || node[:dbhost]
 
-bash 'Install mediawiki' do
+bash 'Install mediawiki LB' do
   user 'root'
   cwd  "#{node['mediawiki']['path']}"
   code <<-EOH
