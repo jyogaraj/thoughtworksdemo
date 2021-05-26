@@ -132,17 +132,7 @@ Resources:
         Ref: DBInstanceType
       AvailabilityZone: us-east-1a
       InstallUpdatesOnBoot: true
-  dbInstance2:
-    Type: AWS::OpsWorks::Instance
-    Properties:
-      StackId:
-        Ref: thoughtworksDemoStack
-      LayerIds:
-      - Ref: databaseLayer
-      InstanceType:
-        Ref: DBInstanceType
-      AvailabilityZone: us-east-1b
-      InstallUpdatesOnBoot: true
+      SshKeyName: yogaraj-aws
   webLayer:
     Type: AWS::OpsWorks::Layer
     Properties:
@@ -191,6 +181,7 @@ Resources:
         Ref: WebInstanceType
       AvailabilityZone: us-east-1a
       InstallUpdatesOnBoot: true
+      SshKeyName: yogaraj-aws
   webInstance2:
     DependsOn: dbInstance
     Type: AWS::OpsWorks::Instance
@@ -203,6 +194,7 @@ Resources:
         Ref: WebInstanceType
       AvailabilityZone: us-east-1b
       InstallUpdatesOnBoot: true
+      SshKeyName: yogaraj-aws
   mediawikiApp:
     Type: AWS::OpsWorks::App
     Properties:
@@ -216,7 +208,6 @@ Resources:
       Attributes:
         DocumentRoot: web
   elb:
-    DependsOn: webInstance1
     Type: AWS::ElasticLoadBalancing::LoadBalancer
     Properties:
       AvailabilityZones:
