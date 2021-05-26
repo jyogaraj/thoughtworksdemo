@@ -1,11 +1,11 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Parameters:
   WebInstanceType:
-    Default: t3.micro
+    Default: t3.medium
     Description: Instance type
     Type: String
   DBInstanceType:
-    Default: t3.micro
+    Default: t3.medium
     Description: Instance type
     Type: String
   #bRootPassword:
