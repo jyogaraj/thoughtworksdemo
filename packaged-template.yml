@@ -1,11 +1,11 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Parameters:
   WebInstanceType:
-    Default: t3.micro
+    Default: t3.medium
     Description: Instance type
     Type: String
   DBInstanceType:
-    Default: t3.micro
+    Default: t3.medium
     Description: Instance type
     Type: String
 Resources:
@@ -132,7 +132,6 @@ Resources:
         Ref: DBInstanceType
       AvailabilityZone: us-east-1a
       InstallUpdatesOnBoot: true
-      SshKeyName: yogaraj-aws
   webLayer:
     Type: AWS::OpsWorks::Layer
     Properties:
@@ -181,7 +180,6 @@ Resources:
         Ref: WebInstanceType
       AvailabilityZone: us-east-1a
       InstallUpdatesOnBoot: true
-      SshKeyName: yogaraj-aws
   webInstance2:
     DependsOn: dbInstance
     Type: AWS::OpsWorks::Instance
@@ -194,7 +192,6 @@ Resources:
         Ref: WebInstanceType
       AvailabilityZone: us-east-1b
       InstallUpdatesOnBoot: true
-      SshKeyName: yogaraj-aws
   mediawikiApp:
     Type: AWS::OpsWorks::App
     Properties:
