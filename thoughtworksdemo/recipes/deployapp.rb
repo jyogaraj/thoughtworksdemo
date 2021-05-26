@@ -58,9 +58,9 @@ search("aws_opsworks_instance").each do |instance|
               user 'root'
               cwd  "#{node['mediawiki']['path']}"
               code <<-EOH
-              /usr/bin/php #{node['mediawiki']['path']}/maintenance/install.php --conf #{node['mediawiki']['path']}/LocalSettings.php #{node['mediawiki']['title']} admin --pass #{node['mediawiki']['password']} --dbname wikidatabase --dbuser wiki --dbpass #{node['mysql']['wiki_user_password']} --dbserver #{instance['private_ip']} --lang #{node['mediawiki']['lang']} --scriptpath '' --server ''
+              /usr/bin/php #{node['mediawiki']['path']}/maintenance/install.php --conf /var/tmp/LocalSettings.php #{node['mediawiki']['title']} admin --pass #{node['mediawiki']['password']} --dbname wikidatabase --dbuser wiki --dbpass #{node['mysql']['wiki_user_password']} --dbserver #{instance['private_ip']} --lang #{node['mediawiki']['lang']} --scriptpath '' --server ''
               EOH
-              not_if { ::File.exist?(node['mediawiki']['path'] + '/LocalSettings.php') }
+              not_if { ::File.exist?('/var/tmp/LocalSettings.php') }
             end
         end
     end
