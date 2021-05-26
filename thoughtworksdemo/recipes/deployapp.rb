@@ -73,6 +73,7 @@ end
 
 execute "move file" do
   command "mv /var/www/mw/LocalSettings.php /var/tmp"
+  not_if { ::File.exist?('/var/tmp/LocalSettings.php') }
 end
 
 instance = search("aws_opsworks_instance", "self:true").first
